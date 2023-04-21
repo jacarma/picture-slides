@@ -16,11 +16,11 @@ function Slide_({ post, preloading }: { post: Post; preloading: boolean }) {
   }, [post.user.username, post.mediaId]);
   return (
     <div
-      className={`w-full h-[100vh] absolute bg-white grid grid-cols-3 transition-opacity duration-300 ${
+      className={`w-full h-[100vh] absolute bg-white grid grid-rows-3 sm:grid-rows-1 sm:grid-cols-3 transition-opacity duration-300 ${
         preloading ? "-z-10 opacity-0" : "z-10 opacity-100"
       }`}
     >
-      <div className="col-span-2 h-full w-full relative">
+      <div className="row-span-2 sm:row-span-1 sm:col-span-2 h-full w-full relative">
         <img
           className="object-cover w-full h-full blur absolute"
           src={media?.urls.small}
