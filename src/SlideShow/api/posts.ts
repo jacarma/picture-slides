@@ -1,7 +1,7 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
+import memoizeOne from "memoize-one";
 const PAGE_SIZE = 15;
 let currentPostsPage = 0;
-const MAX_RETRIES = 10;
 
 export type Post = {
   id: string;
@@ -15,58 +15,43 @@ export type Post = {
   title: string | null;
   description: string;
 };
-export type PostsResponse = {
-  success: boolean;
-  response: { posts: Post[] };
-};
-const posts: Post[] = [];
-let lastRequestPromise: Promise<AxiosResponse<PostsResponse>> | null = null;
-let isRequesting = false;
+const postsQueue: Post[] = [];
 
-export async function getNextPostsPage() {
-  if (isRequesting) return await lastRequestPromise;
-  isRequesting = true;
-  await withRetries(getNextPostsPage_, MAX_RETRIES);
-  isRequesting = false;
-}
-
-async function getNextPostsPage_() {
-  // TODO: what happens when we reach the end
-  // TODO: retries
-
-  // is case there is a request already in progress we wait for it to finish
-  const offset = currentPostsPage * PAGE_SIZE;
+const performRequest = memoizeOne((offset: number) => {
   const config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `/.netlify/functions/posts?offset=${offset}&limit=${PAGE_SIZE}`,
   };
-  lastRequestPromise = axios.request<PostsResponse>(config);
-  const { data } = await lastRequestPromise;
+  return axios.request(config);
+});
+
+async function getNextPostsPage_() {
+  // TODO: what happens when we reach the end
+  const offset = currentPostsPage * PAGE_SIZE;
+  const { data } = await performRequest(offset);
   if (!data || !data.success) throw new Error(`Error fetching posts: ${data}`);
-  posts.push(...data.response.posts);
+  postsQueue.push(...data.response.posts);
   currentPostsPage++;
 }
 
 export async function getNextPost() {
-  if (!posts.length) {
-    // if we have no posts we need to wait
+  if (!postsQueue.length) {
     await getNextPostsPage();
   }
-  if (posts.length < 3) {
-    // when we have few posts we start asking for more without the await
+  if (postsQueue.length < 3) {
     getNextPostsPage();
   }
-  const post = posts.shift();
+  const post = postsQueue.shift();
   if (!post) throw new Error("No posts available");
   return post;
 }
 
-async function withRetries(fn: () => void, maxRetries = 0) {
+export async function getNextPostsPage(maxRetries = 10) {
   try {
-    await fn();
+    await getNextPostsPage_();
   } catch (ex) {
     if (maxRetries === 0) throw ex;
-    await withRetries(fn, maxRetries - 1);
+    await getNextPostsPage(maxRetries - 1);
   }
 }

@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
+import memoize from "fast-memoize";
 
 export type User = {
   id: string;
@@ -12,33 +13,17 @@ export type User = {
   };
 };
 
-export type UserResponse = {
-  success: boolean;
-  response: {
-    user: User;
-  };
-};
-
-const users: { [key: string]: User | Promise<AxiosResponse<UserResponse>> } =
-  {};
-export async function getUser(username: string) {
-  if (users[username]) {
-    if (users[username] instanceof Promise) {
-      const response = (await users[username]) as AxiosResponse<UserResponse>;
-      return response.data.response.user;
-    }
-    return users[username];
-  }
-
+const performRequest = memoize((username: string) => {
   const config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `/.netlify/functions/user?username=${username}`,
   };
-  const promise = axios.request(config);
-  users[username] = promise;
-  const { data } = await promise;
+  return axios.request(config);
+});
+
+export async function getUser(username: string) {
+  const { data } = await performRequest(username);
   if (!data.success) throw new Error(`Error fetching posts: ${data}`);
-  users[username] = data.response.user;
   return data.response.user;
 }
