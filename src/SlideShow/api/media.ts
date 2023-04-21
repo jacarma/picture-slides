@@ -14,14 +14,15 @@ export type Media = {
 
 // sometimes react renders the same component twice in a row
 // so we need to memoize the request to prevent double requests
-const performRequest = memoizeOne((mediaId: string) => {
+const performRequest_ = (mediaId: string) => {
   const config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `/.netlify/functions/media?media-id=${mediaId}`,
   };
   return axios.request(config);
-});
+};
+let performRequest = memoizeOne(performRequest_);
 
 export async function getMedia(
   mediaId: string,
@@ -32,6 +33,8 @@ export async function getMedia(
     if (!data.success) throw new Error(`Error fetching media: ${data}`);
     return data.response.media as Media;
   } catch (ex) {
+    // regenerate the memoized function because the cache is wrong
+    performRequest = memoizeOne(performRequest_);
     if (maxRetries > 0) {
       return await getMedia(mediaId, maxRetries - 1);
     } else {

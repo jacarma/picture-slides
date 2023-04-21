@@ -17,14 +17,15 @@ export type Post = {
 };
 const postsQueue: Post[] = [];
 
-const performRequest = memoizeOne((offset: number) => {
+const performRequest_ = (offset: number) => {
   const config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `/.netlify/functions/posts?offset=${offset}&limit=${PAGE_SIZE}`,
   };
   return axios.request(config);
-});
+};
+let performRequest = memoizeOne(performRequest_);
 
 async function getNextPostsPage_() {
   // TODO: what happens when we reach the end
@@ -51,6 +52,8 @@ export async function getNextPostsPage(maxRetries = 10) {
   try {
     await getNextPostsPage_();
   } catch (ex) {
+    // regenerate the memoized function because the cache is wrong
+    performRequest = memoizeOne(performRequest_);
     if (maxRetries === 0) throw ex;
     await getNextPostsPage(maxRetries - 1);
   }
