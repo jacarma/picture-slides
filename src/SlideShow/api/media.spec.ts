@@ -1,4 +1,5 @@
-import axios from "axios";
+import importedAxios from "axios";
+import { MockedObject } from "vitest";
 import { getMedia, Media } from "./media";
 
 vitest.mock("axios", () => {
@@ -8,6 +9,8 @@ vitest.mock("axios", () => {
     },
   };
 });
+
+const axios = importedAxios as unknown as MockedObject<typeof importedAxios>;
 
 // Sample Media to use during tests
 const sampleMedia: Media = {

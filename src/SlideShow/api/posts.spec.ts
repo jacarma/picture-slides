@@ -1,5 +1,6 @@
-import axios from "axios";
+import importedAxios from "axios";
 import { getNextPost, getNextPostsPage } from "./posts";
+import { MockedObject } from "vitest";
 
 vi.mock("axios", () => ({
   default: {
@@ -7,7 +8,7 @@ vi.mock("axios", () => ({
   },
 }));
 
-// const axios = axios as vi.Mocked<typeof axios>;
+const axios = importedAxios as unknown as MockedObject<typeof importedAxios>;
 
 describe("posts testing", () => {
   afterEach(() => {
