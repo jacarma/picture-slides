@@ -1,11 +1,11 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
+import * as hooks from "usehooks-ts";
+import * as likeicon from "./LikeIcon";
 import SlideShow from "./SlideShow";
+import * as media from "./api/media";
 import * as posts from "./api/posts";
 import * as users from "./api/users";
-import * as media from "./api/media";
-import * as hooks from "usehooks-ts";
-import { act } from "react-dom/test-utils";
-import * as likeicon from "./LikeIcon";
 
 const intervalMock = {
   fn: console.log,
