@@ -39,7 +39,10 @@ export default function SlideShow() {
         <Slide post={headPost} key={headPost.id} preloading={showTails} />
       )}
       {!headPost && !tailsPost && (
-        <div className="animate-spin rounded-full border-4 border-amber-200 border-t-amber-400 w-10 h-10 absolute top-[50vh] left-1/2 -ml-5 -mt-5"></div>
+        <div
+          role="alert"
+          className="animate-spin rounded-full border-4 border-amber-200 border-t-amber-400 w-10 h-10 absolute top-[50vh] left-1/2 -ml-5 -mt-5"
+        ></div>
       )}
     </div>
   );
