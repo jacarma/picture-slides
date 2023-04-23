@@ -4,10 +4,38 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>Picture Slider</title>
+    <style>
+      #spinner {
+        box-sizing: border-box;
+        border-style: solid;
+        position: absolute;
+        left: 50%;
+        top: 50vh;
+        margin-left: -1.25rem;
+        margin-top: -1.25rem;
+        height: 2.5rem;
+        width: 2.5rem;
+        animation: spin 1s linear infinite;
+        border-radius: 9999px;
+        border-width: 4px;
+        border-color: rgb(253 230 138);
+        border-top-color: rgb(251 191 36);
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="spinner"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

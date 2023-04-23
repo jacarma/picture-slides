@@ -1,5 +1,7 @@
+import SlideShow from "./SlideShow/SlideShow";
+
 function App() {
-  return <>TODO</>;
+  return <SlideShow />;
 }
 
 export default App;
