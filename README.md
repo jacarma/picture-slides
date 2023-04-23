@@ -1,4 +1,4 @@
-# Picture Slides
+# Picture Slides
 
 [https://javi-talarian-test.netlify.app/](https://javi-talarian-test.netlify.app/)
 
